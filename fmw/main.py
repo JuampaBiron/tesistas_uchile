@@ -1,6 +1,7 @@
 import logging
 import os
 import argparse
+import pandas as pd
 from build_worktray import BuildWorktray
 from s1_ucampus_get_tesistas import UcampusTesistas  
 from s2_ucampus_get_prof_guia import UcampusGetProfeGuia
