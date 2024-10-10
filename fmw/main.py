@@ -4,7 +4,7 @@ import argparse
 from build_worktray import BuildWorktray
 from s1_ucampus_get_tesistas import UcampusTesistas  
 from s2_ucampus_get_prof_guia import UcampusGetProfeGuia
-#from s3_ucampus_get_rut_sexo_prof import EmailAutomation
+
 
 
 # Configuración del logger
