@@ -1,11 +1,10 @@
 import logging
 import os
 import argparse
-import pandas as pd
 from build_worktray import BuildWorktray
 from s1_ucampus_get_tesistas import UcampusTesistas  
 from s2_ucampus_get_prof_guia import UcampusGetProfeGuia
-
+from s3_get_info_from_professor import GenerateFinalReport
 
 
 # Configuración del logger
@@ -28,11 +27,13 @@ class Robot:
                 UcampusTesistas(url=self.url,min_year=self.min_cohorte,max_year=self.max_cohorte).run_workflow()
             elif self.state == 2:
                 UcampusGetProfeGuia(url=self.url).run_workflow()
+            elif self.state == 3:
+                GenerateFinalReport().run_workflow()
             self.state += 1
         logging.info("Proceso completado.")
 
     
 if __name__ == "__main__":    
-    robot = Robot(start_state=2, final_state=2, min_cohorte=2018, max_cohorte=2024)
+    robot = Robot(start_state=0, final_state=2, min_cohorte=2018, max_cohorte=2024)
     robot.run()
 

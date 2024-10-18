@@ -60,13 +60,14 @@ class UcampusGetProfeGuia:
     
     def navigate_bia(self):
         df_estudiantes = pd.read_excel(self.estudiantes)
-        
+
         btn_boletines = (By.XPATH, "//a[contains(@href, 'https://ucampus.uchile.cl/m/fcfm_bia/') and contains(text(), 'Boletines')]")
         self.wait_10.until(EC.element_to_be_clickable(btn_boletines))
         self.driver.find_element(*btn_boletines).click()
 
         for index, row in df_estudiantes.iterrows():
-            if row["Extracted"] != True:
+            boolExtracted = row["Extracted"]
+            if row["Tesista"] != True:
                 rut = row['Rut']
                 programa = row['Programa']
                 cohorte = row["Cohorte"]
@@ -82,13 +83,15 @@ class UcampusGetProfeGuia:
                     btn_buscar = (By.XPATH, "//input[@type='submit' and contains(@value, 'Buscar')]")
                     self.driver.find_element(*btn_buscar).click()
                     seccion_tesis = None
+                    
                     try:
                         seccion_inscripcion_tesis = (By.XPATH,"//h2[contains(text(), 'Exámenes de Grado y/o Título')]")
                         self.wait_1.until(EC.element_to_be_clickable(seccion_inscripcion_tesis))
                         seccion_tesis = self.driver.find_element(*seccion_inscripcion_tesis).text
                         logging.info(f"Tiene {seccion_tesis}")
                     except:
-                        logging.info("No existe sección se tesis")
+                        logging.info("No existe sección de tesis")
+
                     if seccion_tesis:
                         target_table = self.driver.find_element("xpath", "//h2[contains(text(), 'Exámenes de Grado y/o Título')]/following::table[.//th[contains(text(), 'Examen / Título')]]")
                         rows = target_table.find_elements("xpath", ".//tbody/tr")
@@ -99,15 +102,15 @@ class UcampusGetProfeGuia:
                                 professor = tesis_row.find_element("xpath", "./td[contains(@class, 'privado')]").text
                                 logging.info(professor)
 
-                        if professor and isinstance(professor,str):
+                        if professor and isinstance(professor, str):
                             df_estudiantes.at[index, "Profesor guia"] = professor
                             df_estudiantes.at[index, "Tesista"] = "TRUE"
-                            logging.info(f"Profesor encontrado en secciòn tesis: {professor}")
+                            logging.info(f"Profesor encontrado en sección tesis: {professor}")
                         else:
                             try:
                                 posible = (By.XPATH, f"//tr[td/h1[contains(text(),'Inscripción del Tema de Tesis')] \
-                                   and td[contains(text(),'{programa}')] \
-                                   and td[contains(text(),'Aceptado')]]")
+                                and td[contains(text(),'{programa}')] \
+                                and td[contains(text(),'Aceptado')]]")
                                 tesista = self.driver.find_element(*posible).text
                                 logging.info(f"Tesista sin profe asociado")
                                 df_estudiantes.at[index, "Tesista"] = "TRUE"
@@ -115,7 +118,12 @@ class UcampusGetProfeGuia:
                             except:
                                 logging.info(f"No se encontró tesista")
                                 df_estudiantes.at[index, "Tesista"] = "FALSE"
-                                logging.info(f"Seccion tesis encontrada pero no se encontró profesor")
+                                logging.info(f"Sección tesis encontrada pero no se encontró profesor")
+
+                    else:
+                        # Si no hay sección de tesis, marcar como 'FALSE'
+                        df_estudiantes.at[index, "Tesista"] = "FALSE"
+                        logging.info(f"No se encontró sección tesis para {rut}")
 
                     df_estudiantes.at[index, "Extracted"] = "TRUE"
 
@@ -128,6 +136,7 @@ class UcampusGetProfeGuia:
                     df_estudiantes.to_excel(self.estudiantes, index=False, sheet_name="base")
                 except Exception as e:
                     logging.error("Error al guardar el archivo de Excel: %s", e)
+
 
     def run_workflow(self):
         logging.info(f"************ Inicio del workflow {self.__class__.__name__} ************")

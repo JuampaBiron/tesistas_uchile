@@ -11,10 +11,10 @@ class BuildWorktray:
     def __init__(self):
         self.process_data_folder = r"process_data"
         #archivos input
-        self.template_worktray = r"framework\input\_worktray_template.xlsx"
-        self.template_estudiantes = r"framework\input\_estudiantes_postgrado.xlsx"
-        self.template_programas = r"framework\input\_programas_postgrado.xlsx"
-        self.template_prof = r"framework\input\_profesores.xlsx"
+        self.template_worktray = r"input\_worktray_template.xlsx"
+        self.template_estudiantes = r"input\_estudiantes_postgrado.xlsx"
+        self.template_programas = r"input\_programas_postgrado.xlsx"
+        self.template_prof = r"input\_profesores.xlsx"
         #archivos process_data
         self.worktray_path = r"process_data\worktray.xlsx"
         self.estudiantes = r"process_data\estudiantes_postgrados.xlsx"
